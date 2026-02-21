@@ -37,6 +37,19 @@ const getInitialState = (): PermissionState => {
           },
         ],
       },
+      {
+        id: 100,
+        title: "User Management",
+        permission: "Admin",
+        menuType: 2,
+        mark: "",
+        orderNum: 2,
+        route: "/user-management",
+        componentPath: "./pages/UserManagement.tsx",
+        parentId: undefined,
+        level: 0,
+        children: [],
+      },
     ],
   };
 };

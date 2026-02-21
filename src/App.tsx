@@ -21,7 +21,8 @@ import componentMaps from "./componentMaps";
 
 import Demo from "./pages/demo/index";
 
-const Dashboard = lazy(() => import("./pages/Dashboard"));
+import Dashboard from "./pages/Dashboard";
+const UserManagement = lazy(() => import("./pages/UserManagement"));
 
 const App: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -96,6 +97,11 @@ const App: React.FC = () => {
               <Route path="/users" element={<Users />} />
               <Route path="/settings" element={<Settings />} /> */}
               <Route path="/" element={<Dashboard />} />
+              <Route path="/user-management" element={
+                <Suspense fallback={<CircularProgress />}>
+                  <UserManagement />
+                </Suspense>
+              } />
               <Route path="/profile" element={<ProfileForm />} />
             </Route>
             <Route path="*" element={<Page404 />} />
