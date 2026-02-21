@@ -19,6 +19,7 @@ import * as Yup from "yup";
 
 import { get, post } from "../request/axios/index";
 import { UserPermissionDto } from "../types/menu";
+import toast from "react-hot-toast";
 
 //Define the type of form value
 interface LoginFormValues {
@@ -50,15 +51,36 @@ const Login: React.FC = () => {
     setIsLoading(true);
     setError("");
 
-    dispatch(
-      login({
-        accessToken: "accessToken",
-        refreshToken: "refreshToken",
-        user: { id: 1, userName: "admin" },
-      })
-    ); 
- 
-    navigate("/"); //After successful login, jump to the homepage
+    try {
+      const response = await post<{
+        accessToken: string;
+        refreshToken: string;
+        user: any;
+      }>("/auth/login", {
+        userName: values.username,
+        password: values.password,
+      });
+
+      if (response.isSuccess) {
+        dispatch(
+          login({
+            accessToken: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
+            user: response.data.user,
+          })
+        );
+        toast.success("Login successful");
+        navigate("/");
+      } else {
+        setError(response.message || "Invalid username or password");
+      }
+    } catch (err: any) {
+      setError("An error occurred during login. Please try again.");
+      console.error("Login error:", err);
+    } finally {
+      setIsLoading(false);
+      setSubmitting(false);
+    }
   };
 
   const handleTogglePasswordVisibility = () => {
