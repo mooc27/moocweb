@@ -17,6 +17,7 @@ import { clearPermissions } from '../../store/PermissionSlice'
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import { Role } from '../../types/enum';
 import { ensureTrailingSlash, isBase64DataURL } from '../../utils/stringUtil';
 
 const drawerWidth = 300;
@@ -102,17 +103,19 @@ const CustomAppBar: React.FC<CustomAppBarProps> = ({ open, handleDrawerOpen }) =
   return (
     <AppBar position="fixed" open={open}>
       <Toolbar>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          onClick={handleDrawerOpen}
-          edge="start"
-          sx={{ mr: 2, ...(open && { display: 'none' }) }}
-        >
-          <MenuIcon />
-        </IconButton>
+        {/* {(loginUser?.roles?.includes(Role.SuperAdmin) || loginUser?.roles?.includes(Role.Admin)) && ( */}
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            sx={{ mr: 2, ...(open && { display: 'none' }) }}
+          >
+            <MenuIcon />
+          </IconButton>
+        {/* )} */}
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          Mooc Dashboard
+          {loginUser?.roles?.includes(Role.SuperAdmin) || loginUser?.roles?.includes(Role.Admin) ? 'Mooc Dashboard' : 'Mooc'}
         </Typography>
         <Box>
           <IconButton

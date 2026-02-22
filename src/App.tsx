@@ -22,6 +22,7 @@ import componentMaps from "./componentMaps";
 import Demo from "./pages/demo/index";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 
 const App: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -90,12 +91,9 @@ const App: React.FC = () => {
                 </>
               }
             >
-             {menuItems && renderRoutes(menuItems)}
-
-              {/* <Route path="/" element={<Dashboard />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/settings" element={<Settings />} /> */}
-              <Route path="/" element={<Dashboard />} />
+              {menuItems && renderRoutes(menuItems)}
+              <Route index element={<LandingPage />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<ProfileForm />} />
             </Route>
             <Route path="*" element={<Page404 />} />

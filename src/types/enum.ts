@@ -1,3 +1,10 @@
+export enum Role {
+  SuperAdmin = 'super admin',
+  Admin = 'admin',
+  Teacher = 'teacher',
+  Student = 'student',
+}
+
 export enum Gender {
   other = 0,
   male = 1,
