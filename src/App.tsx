@@ -1,32 +1,27 @@
 import * as React from "react";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Box, CircularProgress, CssBaseline } from "@mui/material";
+import { Box, CssBaseline } from "@mui/material";
 import { Toaster } from "react-hot-toast";
 import CustomAppBar from "./components/mainLayout/AppBar";
 import Layout from "./components/mainLayout/Layout";
 import Login from "./pages/Login";
 import Page404 from "./pages/page404";
-import { Provider } from "react-redux";
-import store from "./store/store";
+import { Provider, useSelector } from "react-redux";
+import store, { RootState } from "./store/store";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import { useSelector } from "react-redux";
-import { RootState } from "./store/store";
-import { useDispatch } from "react-redux";
-
-import { MenuDto, UserPermissionDto } from "./types/menu";
+import { MenuDto } from "./types/menu";
 import ProfileForm from "./pages/ProfileForm";
+import CategoryPage from "./pages/category/CategoryPage";
 import componentMaps from "./componentMaps";
-
-import Demo from "./pages/demo/index";
 
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 
 const App: React.FC = () => {
   const [open, setOpen] = useState(false);
 
-  //Recursive generation of routing
+  // Recursive generation of routing
   const renderRoutes = (items: MenuDto[]) => {
     return items.map((item) => {
       const Component =
@@ -38,33 +33,21 @@ const App: React.FC = () => {
           <Route
             path={item.route}
             element={
-              // <Suspense fallback={<CircularProgress />}>
-              //   {Component ? <Component /> : null} {/* If the component exists, render; otherwise, return null */}
-              // </Suspense>
               <Suspense>
-                {Component ? <Component /> : null}{" "}
-                {/* If the component exists, render; otherwise, return null */}
+                {Component ? <Component /> : null}
               </Suspense>
             }
           />
-          {item.children && renderRoutes(item.children)}{" "}
-          {/* Recursive rendering sub route */}
+          {item.children && renderRoutes(item.children)}
         </React.Fragment>
       );
     });
   };
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
+  const handleDrawerOpen = () => setOpen(true);
+  const handleDrawerClose = () => setOpen(false);
 
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuth);
   const { menuItems } = useSelector((state: RootState) => state.permission);
-  const dispatch = useDispatch();
 
   return (
     <Provider store={store}>
@@ -73,10 +56,7 @@ const App: React.FC = () => {
         <Box sx={{ display: "flex" }}>
           <CssBaseline />
           <Routes>
-            {/* Login page not required Layout */}
             <Route path="/login" element={<Login />} />
-
-            {/* Other pages require Layout */}
             <Route
               element={
                 <>
@@ -90,13 +70,10 @@ const App: React.FC = () => {
                 </>
               }
             >
-             {menuItems && renderRoutes(menuItems)}
-
-              {/* <Route path="/" element={<Dashboard />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/settings" element={<Settings />} /> */}
+              {menuItems && renderRoutes(menuItems)}
               <Route path="/" element={<Dashboard />} />
               <Route path="/profile" element={<ProfileForm />} />
+              <Route path="/category" element={<CategoryPage />} />
             </Route>
             <Route path="*" element={<Page404 />} />
           </Routes>
