@@ -44,7 +44,7 @@ const UserManagement: React.FC = () => {
     setLoading(true);
     try {
       const response: ApiResponseResult<PagedResultDto<UserDto>> = await get(
-        "/users",
+        "/user",
         {
           page: page + 1,
           pageSize: pageSize,
