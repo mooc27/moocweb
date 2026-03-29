@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { login } from "../store/authSlice";
 import { setPermissions } from "../store/PermissionSlice";
-import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
+import { Formik, Form, Field, ErrorMessage,FormikHelpers } from "formik";
 import {
   Box,
   Button,
@@ -16,9 +16,10 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import * as Yup from "yup";
-
+import { jwtDecode } from "jwt-decode";
 import { get, post } from "../request/axios/index";
 import { UserPermissionDto } from "../types/menu";
+
 
 //Define the type of form value
 interface LoginFormValues {
@@ -50,15 +51,46 @@ const Login: React.FC = () => {
     setIsLoading(true);
     setError("");
 
-    dispatch(
-      login({
-        accessToken: "accessToken",
-        refreshToken: "refreshToken",
-        user: { id: 1, userName: "admin" },
-      })
-    ); 
- 
-    navigate("/"); //After successful login, jump to the homepage
+    try {
+      const response = await post<{ accessToken: string; refreshToken: string }>(
+        "/auth/login",
+        { username: values.username, password: values.password }
+      );
+
+      if (!response.isSuccess) {
+        setError(response.message || "Login failed.");
+        return;
+      }
+
+      const { accessToken, refreshToken } = response.data;
+      const decoded = jwtDecode<Record<string, any>>(accessToken);
+      const roleClaim = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+      const roles: string[] = Array.isArray(roleClaim)
+        ? roleClaim
+        : roleClaim
+        ? [roleClaim]
+        : [];
+
+      dispatch(
+        login({
+          accessToken,
+          refreshToken,
+          user: {
+            id: decoded["id"],
+            firstName: decoded["firstName"],
+            lastName: decoded["lastName"],
+            roles,
+          },
+        })
+      );
+
+      navigate("/");
+    } catch (err) {
+      setError("Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+      setSubmitting(false);
+    }
   };
 
   const handleTogglePasswordVisibility = () => {

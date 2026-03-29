@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { ApiResponseResult } from "../../types/types";
 
 interface RefreshTokenResponse {
-  assceToken: string;
+  accessToken: string;
   refreshToken: string;
 }
 
@@ -28,12 +28,12 @@ const refreshToken = async () => {
     window.location.href = "/login";
   }
   const response: ApiResponseResult<RefreshTokenResponse> = await instance.post(
-    "/auth/RefreshToken",
+    "/auth/refresh",
     { refreshToken: refreshTokenValue }
   );
   if (response.isSuccess) {
     // Update stored tokens
-    localStorage.setItem("accessToken", response.data.assceToken);
+    localStorage.setItem("accessToken", response.data.accessToken);
     localStorage.setItem("refreshToken", response.data.refreshToken);
   } else {
     localStorage.removeItem("accessToken");
@@ -81,7 +81,7 @@ instance.interceptors.response.use(
             //Reset the token and retry the request
             originalRequest.headers[
               "Authorization"
-            ] = `Bearer ${localStorage.getItem("token")}`;
+            ] = `Bearer ${localStorage.getItem("accessToken")}`;
             originalRequest._retry = true;
 
             return instance(originalRequest);
@@ -95,7 +95,7 @@ instance.interceptors.response.use(
           return refreshTokenPromise!.then(() => {
             originalRequest.headers[
               "Authorization"
-            ] = `Bearer ${localStorage.getItem("token")}`;
+            ] = `Bearer ${localStorage.getItem("accessToken")}`;
             originalRequest._retry = true;
 
             return instance(originalRequest);
